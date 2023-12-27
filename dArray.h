@@ -53,13 +53,7 @@ public:
     bool operator>(const DArray<T> &d_arry);
     bool operator>=(const DArray<T> &d_arry);
 
-    T operator[](int i)
-    {
-        int calc_index = (i < 0) ? len + i : i;
-        if (calc_index < 0 || calc_index > len)
-            throw std::out_of_range("Don't try to access out of range index, DUMBASS.");
-        return array[calc_index];
-    }
+    T& operator[](int idx)
 
     friend ostream& operator<< <T>(ostream &stream, const DArray<T> &d_array);
 };
@@ -288,6 +282,15 @@ bool DArray<T>::operator>=(const DArray<T> &d_array)
     }
     else
         return false;
+}
+
+// Slicing Operator Overload
+template <class T>
+T& DArray<T>::operator[] (int idx) {
+    int calc_index = (i < 0) ? len + i : i;
+    if (calc_index < 0 || calc_index > len)
+        throw std::out_of_range("Don't try to access out of range index, DUMBASS.");
+    return array[calc_index];
 }
 
 // Insertor Operator Overload
