@@ -1,9 +1,6 @@
-#ifndef D_ARRAY_H // Header gaurd
-#define D_ARRAY_H
+#pragma once
 #include <iostream>
 
-using std::cout;
-using std::endl;
 using std::ostream;
 
 // Declarations
@@ -14,12 +11,67 @@ ostream& operator<<(ostream &stream, const DArray<T> &d_array);
 
 const size_t DEFAULT_SIZE = 10;
 
+template <class Array>
+class ArrayIterator {
+public:
+    using Type = typename Array::Type;
+public:
+    ArrayIterator(Type* data)
+        :array(data) {}
+    
+    // Increment and Decrement Operator
+    ArrayIterator& operator++() {
+        array++;
+        return *this;
+    }
+    ArrayIterator operator++(int) {
+        ArrayIterator temp = *this;
+        ++(*this);
+        return temp;
+    }
+    ArrayIterator& operator--() {
+        array--;
+        return *this;
+    }
+    ArrayIterator operator--(int) {
+        ArrayIterator temp = *this;
+        --(*this);
+        return temp;
+    }
+
+    // Relation Operator
+    bool operator==(const ArrayIterator &itr) const {
+        return array == itr.array;
+    }
+    bool operator!=(const ArrayIterator &itr) const {
+        return !(array == itr.array);
+    }
+
+    Type& operator*() {
+        return *array;
+    }
+
+    Type& operator[](int idx) {
+        return *(array + idx);
+    }
+
+    Type* operator->() {
+        return array;
+    }
+
+private:
+    Type* array;
+};
+
 template <class T>
 class DArray
 {
     T *array;
     size_t cap = DEFAULT_SIZE; // stores current capacity of darray
     size_t len = 0; // stores length
+public:
+    using Type = T;
+    using Iterator = ArrayIterator<DArray<T>>;
 public:
     DArray() {
         array = (T *)malloc(cap * sizeof(T));
@@ -56,6 +108,13 @@ public:
     T& operator[](int idx)
 
     friend ostream& operator<< <T>(ostream &stream, const DArray<T> &d_array);
+
+    Iterator begin() {
+        return Iterator(array);
+    }
+    Iterator end() {
+        return Iterator(array + len)
+    }
 };
 
 // Constructors
@@ -201,7 +260,7 @@ DArray<T>& DArray<T>::operator=(const DArray<T> &d_array)
     return this;
 }
 
-// Relative Operator Overload
+// Relational Operator Overload
 template <class T>
 bool DArray<T>::operator==(const DArray<T> &d_arry)
 {
@@ -287,7 +346,7 @@ bool DArray<T>::operator>=(const DArray<T> &d_array)
 // Slicing Operator Overload
 template <class T>
 T& DArray<T>::operator[] (int idx) {
-    int calc_index = (i < 0) ? len + i : i;
+    int calc_index = (idx < 0) ? len + idx : idx;
     if (calc_index < 0 || calc_index > len)
         throw std::out_of_range("Don't try to access out of range index, DUMBASS.");
     return array[calc_index];
@@ -305,4 +364,3 @@ ostream& operator<<(ostream &stream, const DArray<T> &d_array)
 
     return stream;
 }
-#endif
