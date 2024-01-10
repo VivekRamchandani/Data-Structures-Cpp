@@ -50,20 +50,24 @@ public:
     void append(T val);
     void push(T val);
     Node pop();
-    Node remove(T val);
+    void remove(T val);
     int  index(T val);
     void insert(int idx, T val);
     void extend(List<T>& lst);
     void empty();
+    bool isEmpty() {
+        if (head == nullptr) { return true; }
+        return false;
+    }
 private:
     Node* head = nullptr;
     Node* tail = nullptr;
     size_t length = 0;
 
-    Node& _nthNode(unsigned int idx) {
+    Node* _nthNode(unsigned int idx) {
         Node* temp = head;
         for (int i = 0; i < idx; temp = temp->next, i++) {}
-        return *temp;
+        return temp;
     }
 };
 
@@ -127,5 +131,51 @@ Node<T> List<T>::pop() {
     tail = temp.prev;
     tail->next = head;
     head->prev = tail;
+    length -= 1;
     return temp;
+}
+template <typename T>
+void List<T>::remove(T val) {
+    Node* temp = head;
+    int i = 0;
+    for (; i < length || temp->data != val; temp = temp->next, i++) {}
+    if (i == length) { return; }
+    Node* preNode = temp->prev;
+    Node* nextNode = temp->next;
+    preNode->next = nextNode;
+    nextNode->prev = preNode;
+    delete temp;
+}
+template <typename T>
+int List<T>::index(T val) {
+    Node* temp = head;
+    int idx = 0;
+    for (; idx < length || temp->data != val; temp - temp->next, idx++) {}
+    if (idx == length) {throw "Value not found."}
+    return idx;
+}
+template <typename T>
+void List<T>::insert(int idx, T val) {
+    size_t calc_idx = (idx < 0) ? length + idx : idx;
+    if (calc_idx < 0) {
+        throw std::out_of_range("Can't access out of range index.");
+    }
+    Node* temp = new Node(val);
+    Node* nextNode = _nthNode(calc_idx);
+    Node* prevNode = nextNode->prev;
+    temp->next = nextNode;
+    nextNode->prev = temp;
+    temp->prev = prevNode;
+    prevNode->next = temp;
+}
+template <typename T>
+void List<T>::empty() {
+    head->prev = nullptr;
+    tail->next = nullptr;
+    tail = nullptr;
+    Node* temp = head->next;
+    for (int i = 0; i < length; head = temp, i++) {
+        temp = temp->next;
+        delete head;
+    }
 }
