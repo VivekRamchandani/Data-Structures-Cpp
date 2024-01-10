@@ -9,6 +9,8 @@ public:
     T data;
 
     Node(T val): data(val) {}
+    // This copy constructor is quite important.
+    Node(Node& node): data(node.data) {}
 
     friend class List;
 private:
@@ -29,17 +31,15 @@ public:
         tail = head;
         length = 1;
     }
-    List (List<T>& lst) 
-        :head(lst.head), tail(lst.tail), len(lst.len) {}
-    
+    List (List<T>& lst);    
 
-    Node& front() {
+    Node front() {
         if (head) {
             return *head;
         }
         throw nullptr;
     }
-    Node& back() {
+    Node back() {
         if (tail) {
             return *tail;
         }
@@ -49,16 +49,22 @@ public:
 
     void append(T val);
     void push(T val);
-    void pop();
-    void remove(T val);
-    void index(T val);
+    Node pop();
+    Node remove(T val);
+    int  index(T val);
     void insert(int idx, T val);
-    void extend(const List<T>& lst);
+    void extend(List<T>& lst);
     void empty();
 private:
     Node* head = nullptr;
     Node* tail = nullptr;
     size_t length = 0;
+
+    Node& _nthNode(unsigned int idx) {
+        Node* temp = head;
+        for (int i = 0; i < idx; temp = temp->next, i++) {}
+        return *temp;
+    }
 };
 
 // Methods
@@ -73,9 +79,10 @@ void List<T>::append(T val) {
         length = 1; 
         return;
     }
-    temp->next = tail->next;
+    temp->next = head;  // tail->next
     tail->next = temp;
     temp->prev = tail;
+    head->prev = temp;
     tail = temp;
     length += 1;
 }
@@ -90,8 +97,35 @@ void List<T>::push(T val) {
         length = 1; 
         return;
     }
-    temp->prev = head->prev;
+    temp->prev = tail;  // head->prev
     head->prev = temp;
     temp->next = head;
+    tail->next = temp;
     head = temp;
+    length += 1;
+}
+template <typename T>
+void List<T>::extend(List<T>& lst) {
+    if !(head) {
+        head = lst.head;
+        tail = lst.tail;
+        length = lst.length        
+        return;
+    }
+    lst.tail->next = head;
+    tail->next = lst.head;
+    lst.head->prev = tail;
+    head->prev = lst.tail;
+    length += lst.length;
+}
+template <typename T>
+Node<T> List<T>::pop() {
+    // Need to delete last node, so we can't use pointer to that node.
+    Node temp = *tail;
+    // Need to delete 'cause node is in heap memory
+    delete tail;
+    tail = temp.prev;
+    tail->next = head;
+    head->prev = tail;
+    return temp;
 }
