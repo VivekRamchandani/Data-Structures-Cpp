@@ -105,7 +105,7 @@ public:
     bool operator>(const DArray<T> &d_arry);
     bool operator>=(const DArray<T> &d_arry);
 
-    T& operator[](int idx)
+    T& operator[](int idx);
 
     friend ostream& operator<< <T>(ostream &stream, const DArray<T> &d_array);
 
@@ -113,7 +113,7 @@ public:
         return Iterator(array);
     }
     Iterator end() {
-        return Iterator(array + len)
+        return Iterator(array + len);
     }
 };
 
