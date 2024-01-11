@@ -8,6 +8,7 @@
 - Supports stream insertion operation
 - Supports negative indexing (*`darry[-1]` returns value of last element.*)
 - Throws ***out of bound errors***.
+- Supports Iterators.
 
 
 ### Methods
@@ -23,6 +24,29 @@
 ### Example
 
 ```c++
-DArray<int> arry(4);
-cout << arry << endl;    // [ 0, 0, 0, 0 ] 
+DArray<int> arry(4), arry2(3, 99), arry3(arry2);
+std::cout << arry << std::endl;    // [ 0, 0, 0, 0 ]
+std::cout << arry2 << std::endl;    // [ 99, 99, 99 ]
+std::cout << arry3 << std::endl;    // [ 99, 99, 99 ]
+```
+
+Negative Indexing:
+
+```c++
+DArray<int> arry(3);
+arry[-1] = 42;
+std::cout << arry << std::endl;  // [ 0, 0, 42 ]
+```
+
+Supports Iterators:
+
+```c++
+DArray<int> arry(5, 42);
+for (auto itr = arry.begin(); itr != arry.end(); itr++) {
+    *itr = 2;
+}
+for (auto e : arry) {
+    std::cout << e << " "; 
+}
+// Output: 2 2 2 2 2
 ```
