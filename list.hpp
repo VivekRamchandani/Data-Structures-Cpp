@@ -1,6 +1,13 @@
 #pragma once
 #include <iostream>
 
+using std::ostream;
+
+template <typename T>
+class List;
+template <typename T>
+ostream& operator<<(ostream &stream, const List<T> &list);
+
 template <typename T>
 class Node {
 public:
@@ -11,6 +18,26 @@ public:
     Node(T val): data(val) {}
     // This copy constructor is quite important.
     Node(Node& node): data(node.data) {}
+
+    // Relational Operators
+    bool operator==(const Node& node) {
+        return data == node.data;
+    }
+    bool operator<=(const Node& node) {
+        return data <= node.data;
+    }
+    bool operator>=(const Node& node) {
+        return data >= node.data;
+    }
+    bool operator<(const Node& node) {
+        return data < node.data
+    }
+    bool operator>(const Node& node) {
+        return data > node.data
+    }
+    bool operator!=(const Node& node) {
+        return !(data == node.data)
+    }
 
     friend class List;
 private:
@@ -31,7 +58,8 @@ public:
         tail = head;
         length = 1;
     }
-    List (List<T>& lst);    
+    List (const List<T>& lst);
+    ~List();
 
     Node front() {
         if (head) {
@@ -59,6 +87,8 @@ public:
         if (head == nullptr) { return true; }
         return false;
     }
+
+    Node& operator[](size_t idx);
 private:
     Node* head = nullptr;
     Node* tail = nullptr;
@@ -69,7 +99,40 @@ private:
         for (int i = 0; i < idx; temp = temp->next, i++) {}
         return temp;
     }
+
+    friend ostream& operator<< <T>(ostream &stream, const List<T> &list);
 };
+
+// Constructors
+template <typename T>
+List<T>::List(const List<T>& list) {
+    // Creating head and tial
+    head = new Node(list.head);
+    tail = head;
+    Node *temp = list.head->next;
+
+    for (int i = 1; i < list.length; i++, temp = temp->next) {
+        Node* copy = new Node(temp);
+        tail->next = copy;
+        copy->prev = tail;
+        tail = copy;
+    }
+    tail->next = head;
+    head->prev = tail;
+    length = list.length;
+} 
+
+// Destructor
+template <typename T>
+List<T>::~List() {
+    head->prev = nullptr;
+    tail->next = nullptr;
+    Node* nextNode = head;
+    for (int i = 0; i < length; i++, head = nextNode) {
+        nextNode = head->next;
+        delete head;
+    }
+}
 
 // Methods
 template <typename T>
@@ -178,4 +241,25 @@ void List<T>::empty() {
         temp = temp->next;
         delete head;
     }
+}
+
+// Subscript Operator Overload
+template <typename T>
+Node<T>& List<T>::operator[](size_t idx) {
+    size_t calc_idx = (idx < 0) ? length + idx : idx;
+    if (calc_idx < 0) {
+        throw std::out_of_range("Can't access out of range index.");
+    }
+    return *_nthNode(calc_idx)
+}
+
+// Inserter Operator Overload
+template <typename T>
+ostream& operator<< (ostream& stream, const List<T> &list) {
+    Node<T>* temp = list.head;
+    stream << "[ ";
+    for (int i = 0; i < list.length; i++, temp = temp.next)
+        stream << temp->data << " ";
+    stream << std::endl;
+    return stream;
 }
